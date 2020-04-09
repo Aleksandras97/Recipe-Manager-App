@@ -1,0 +1,114 @@
+package com.example.recipemanager;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import androidx.appcompat.widget.SearchView;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+    private RecipeAdapter adapter;
+    private List<Recipe> recipeList;
+    public static final String EXTRA_NAME = "nameText";
+    public static final String EXTRA_CATEGORY = "categoryText";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        fillRecipeList();
+        setUpRecycleView();
+
+        Intent intent = getIntent();
+        String nameText = intent.getStringExtra(EXTRA_NAME);
+        String categoryText = intent.getStringExtra(EXTRA_CATEGORY);
+        //insertRecipe(nameText, categoryText);
+    }
+
+    public void insertRecipe(String name, String category){
+        recipeList.add(new Recipe(name, category, R.drawable.ic_image));
+        adapter.notifyItemInserted(recipeList.size());
+    }
+
+    private void fillRecipeList() {
+        recipeList = new ArrayList<>();
+        recipeList.add(new Recipe("Blynai", "Pusryciai", R.drawable.homemadechickenpotpie));
+        recipeList.add(new Recipe("diavolo", "Pica", R.drawable.diavolo));
+        recipeList.add(new Recipe("funghi", "Pica", R.drawable.funghi));
+        recipeList.add(new Recipe("Blynai", "Pusryciai", R.drawable.homemadechickenpotpie));
+        recipeList.add(new Recipe("diavolo", "Pica", R.drawable.diavolo));
+        recipeList.add(new Recipe("funghi", "Pica", R.drawable.funghi));
+        recipeList.add(new Recipe("Blynai", "Pusryciai", R.drawable.homemadechickenpotpie));
+        recipeList.add(new Recipe("diavolo", "Pica", R.drawable.diavolo));
+        recipeList.add(new Recipe("funghi", "Pica", R.drawable.funghi));
+    }
+
+    private void setUpRecycleView() {
+        RecyclerView recyclerView = findViewById(R.id.recycle_view);
+        recyclerView.setHasFixedSize(true);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        adapter = new RecipeAdapter(recipeList);
+
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
+
+        adapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Intent intent = new Intent(MainActivity.this, RecipeDetailActivity.class);
+                intent.putExtra("Recipe Item", recipeList.get(position));
+                startActivity(intent);
+
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_create_recipe:
+                Intent intent = new Intent(this, NewRecipeActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+}

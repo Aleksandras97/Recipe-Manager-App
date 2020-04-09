@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Recipe Manager</string>
+    <string name="company_name">Recipe Manger</string>
+    <string name="app_image">App Image</string>
+    <string name="home_text">Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+        Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown
+        printer took a galley of type and scrambled it to make a type specimen book. It has survived
+        </string>
+    <string name="home_button">Recipes</string>
+    
+    <string name="new_recipe">Create Recipe</string>
+    <string name="crate_new_recipe">Create New Recipe</string>
+    <string name="name_hint">Enter a name</string>
+    <string name="category_hint">Enter a category</string>
+    <string name="create_recipe">Create Recipe</string>
+</resources>
