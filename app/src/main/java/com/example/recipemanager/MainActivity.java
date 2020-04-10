@@ -8,10 +8,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
+
 import androidx.appcompat.widget.SearchView;
 
 import java.util.ArrayList;
@@ -20,6 +26,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private RecipeAdapter adapter;
     private List<Recipe> recipeList;
+    private List<Category> categoryList;
+    private List<Ingredient> ingredientList;
     public static final String EXTRA_NAME = "nameText";
     public static final String EXTRA_CATEGORY = "categoryText";
 
@@ -31,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+
         fillRecipeList();
         setUpRecycleView();
 
@@ -47,15 +56,37 @@ public class MainActivity extends AppCompatActivity {
 
     private void fillRecipeList() {
         recipeList = new ArrayList<>();
-        recipeList.add(new Recipe("Blynai", "Pusryciai", R.drawable.homemadechickenpotpie));
-        recipeList.add(new Recipe("diavolo", "Pica", R.drawable.diavolo));
-        recipeList.add(new Recipe("funghi", "Pica", R.drawable.funghi));
-        recipeList.add(new Recipe("Blynai", "Pusryciai", R.drawable.homemadechickenpotpie));
-        recipeList.add(new Recipe("diavolo", "Pica", R.drawable.diavolo));
-        recipeList.add(new Recipe("funghi", "Pica", R.drawable.funghi));
-        recipeList.add(new Recipe("Blynai", "Pusryciai", R.drawable.homemadechickenpotpie));
-        recipeList.add(new Recipe("diavolo", "Pica", R.drawable.diavolo));
-        recipeList.add(new Recipe("funghi", "Pica", R.drawable.funghi));
+        SQLiteOpenHelper recipeDatabaseHelper = new RecipeDatabaseHelper(this);
+        try {
+            SQLiteDatabase db = recipeDatabaseHelper.getReadableDatabase();
+            Cursor cursorRecipe = db.query ("RECIPE",
+                    new String[] {"_id", "NAME", "INSTRUCTION", "IMAGE_RESOURCE_ID"},
+                    null, null, null, null, null);
+            while (cursorRecipe.moveToNext()){
+                    int id = cursorRecipe.getInt(0);
+                    String name = cursorRecipe.getString(1);
+                    String instruction = cursorRecipe.getString(2);
+                    int photoId = cursorRecipe.getInt(3);
+                    recipeList.add(new Recipe(id, name, instruction, photoId));
+            }
+            cursorRecipe.close();
+            db.close();
+        } catch (SQLException e){
+            Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT).show();
+        }
+
+
+
+
+//        recipeList.add(new Recipe("Blynai", "Pusryciai", R.drawable.homemadechickenpotpie));
+//        recipeList.add(new Recipe("diavolo", "Pica", R.drawable.diavolo));
+//        recipeList.add(new Recipe("funghi", "Pica", R.drawable.funghi));
+//        recipeList.add(new Recipe("Blynai", "Pusryciai", R.drawable.homemadechickenpotpie));
+//        recipeList.add(new Recipe("diavolo", "Pica", R.drawable.diavolo));
+//        recipeList.add(new Recipe("funghi", "Pica", R.drawable.funghi));
+//        recipeList.add(new Recipe("Blynai", "Pusryciai", R.drawable.homemadechickenpotpie));
+//        recipeList.add(new Recipe("diavolo", "Pica", R.drawable.diavolo));
+//        recipeList.add(new Recipe("funghi", "Pica", R.drawable.funghi));
     }
 
     private void setUpRecycleView() {

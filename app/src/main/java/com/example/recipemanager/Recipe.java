@@ -8,20 +8,28 @@ import java.util.List;
 
 public class Recipe implements Parcelable {
 
+    private int id;
     private String name;
-    private String category;
+    private String instruction;
     private int imageResource;
 
 
-    public Recipe(String name, String category, int imageResource){
+    public Recipe(String name, String instruction, int imageResource){
         this.name = name;
-        this.category = category;
+        this.instruction = instruction;
+        this.imageResource = imageResource;
+    }
+
+    public Recipe(int id, String name, String instruction, int imageResource){
+        this.id = id;
+        this.name = name;
+        this.instruction = instruction;
         this.imageResource = imageResource;
     }
 
     protected Recipe(Parcel in) {
         name = in.readString();
-        category = in.readString();
+        instruction = in.readString();
         imageResource = in.readInt();
     }
 
@@ -45,8 +53,8 @@ public class Recipe implements Parcelable {
         return name;
     }
 
-    public String getCategory(){
-        return category;
+    public String getInstruction(){
+        return instruction;
     }
 
     @Override
@@ -57,7 +65,7 @@ public class Recipe implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
-        dest.writeString(category);
+        dest.writeString(instruction);
         dest.writeInt(imageResource);
     }
 }

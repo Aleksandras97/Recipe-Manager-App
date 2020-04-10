@@ -34,7 +34,8 @@ public class RecipeDetailActivity extends AppCompatActivity {
         Recipe recipe = intent.getParcelableExtra(EXTRA_RECIPE_ID);
 
         String recipeName = recipe.getName();
-        String recipeCategory = recipe.getCategory();
+        //String recipeCategory = recipe.getCategory();
+        String recipeInstruction = recipe.getInstruction();
         int recipeImage = recipe.getImageResource();
 
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
@@ -43,7 +44,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
         imageView.setImageDrawable(ContextCompat.getDrawable(this, recipeImage));
         imageView.setContentDescription(recipeName);
         TextView textView = (TextView) findViewById(R.id.recipe_category);
-        textView.setText(recipeCategory);
+        //textView.setText(recipeCategory);
 
 
     }

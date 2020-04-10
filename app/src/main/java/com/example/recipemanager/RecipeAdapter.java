@@ -31,14 +31,12 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     public static class RecipeViewHolder extends RecyclerView.ViewHolder{
         public ImageView recipeImage;
         public TextView recipeName;
-        public TextView recipeCategory;
 
 
         public RecipeViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
             recipeImage = itemView.findViewById(R.id.recipe_image);
             recipeName = itemView.findViewById(R.id.recipe_name);
-            recipeCategory = itemView.findViewById(R.id.recipe_category);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -72,7 +70,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         Recipe currentRecipe = recipeList.get(position);
 
         holder.recipeName.setText(currentRecipe.getName());
-        holder.recipeCategory.setText(currentRecipe.getCategory());
         holder.recipeImage.setImageResource(currentRecipe.getImageResource());
 
 
