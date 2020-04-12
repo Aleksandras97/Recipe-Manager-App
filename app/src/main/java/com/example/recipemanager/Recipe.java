@@ -28,6 +28,7 @@ public class Recipe implements Parcelable {
     }
 
     protected Recipe(Parcel in) {
+        id = in.readInt();
         name = in.readString();
         instruction = in.readString();
         imageResource = in.readInt();
@@ -44,6 +45,10 @@ public class Recipe implements Parcelable {
             return new Recipe[size];
         }
     };
+
+    public int getId() {
+        return id;
+    }
 
     public int getImageResource(){
         return imageResource;
@@ -64,6 +69,7 @@ public class Recipe implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
         dest.writeString(name);
         dest.writeString(instruction);
         dest.writeInt(imageResource);

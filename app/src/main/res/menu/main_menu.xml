@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/action_search"
         android:icon="@drawable/ic_search"
-        android:title="Search"
+        android:title="@string/search_recipe"
         android:orderInCategory="1"
         app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
@@ -14,5 +14,13 @@
         android:icon="@drawable/ic_add_white_24dp"
         android:orderInCategory="2"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:enabled="true"
+        android:title="@string/filter_recipe"
+        android:icon="@drawable/ic_filter"
+        app:showAsAction="ifRoom"
+        android:id="@+id/action_filter" />
+
 
 </menu>

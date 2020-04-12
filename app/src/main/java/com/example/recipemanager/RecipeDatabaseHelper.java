@@ -37,10 +37,6 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
                     "IMAGE_RESOURCE_ID INTEGER);");
             db.execSQL("CREATE TABLE "+ CATEGORY +" (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "NAME STRING);");
-//            db.execSQL("CREATE TABLE "+ RECIPE_CATEGORY +" (RECIPE_ID INTEGER," +
-//                    "CAREGORY_ID INTEGER," +
-//                    "FOREIGN KEY(RECIPE_ID) REFERENCES "+ RECIPE +" (_id)," +
-//                    "FOREIGN KEY(CATEGORY_ID) REFERENCES "+ CATEGORY +" (_id));");
             db.execSQL("CREATE TABLE " + RECIPECATEGORY + " (RECIPE_ID INTEGER,  "
                     + "CAREGORY_ID INTEGER,"
                     + "FOREIGN KEY(RECIPE_ID) REFERENCES " + RECIPE + "(_id),"

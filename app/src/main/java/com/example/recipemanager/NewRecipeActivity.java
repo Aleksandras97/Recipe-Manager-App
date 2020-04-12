@@ -9,6 +9,10 @@ import androidx.appcompat.widget.Toolbar;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -69,6 +73,14 @@ public class NewRecipeActivity extends AppCompatActivity {
         String nameText = nameView.getText().toString();
         EditText categoryView = (EditText) findViewById(R.id.recipeCategory_detail);
         String categoryText = categoryView.getText().toString();
+        SQLiteOpenHelper recipeDatabaseHelper = new RecipeDatabaseHelper(this);
+        try{
+            SQLiteDatabase db = recipeDatabaseHelper.getReadableDatabase();
+            Cursor cursorRecipes = db.rawQuery("INSERT INTO RECIPE " +
+                    "VALUES ()", null);
+        } catch (SQLException e){
+            Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT).show();
+        }
 
 
         Intent intent = new Intent(this, MainActivity.class);

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.recipemanager">
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -10,9 +11,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".NewRecipeActivity"
-            android:label="@string/new_recipe"
+        <activity android:name=".CategoryFilterActivity"
             android:parentActivityName=".MainActivity"></activity>
+        <activity
+            android:name=".NewRecipeActivity"
+            android:label="@string/new_recipe"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".RecipeDetailActivity"
             android:parentActivityName=".MainActivity" />
@@ -23,8 +27,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"
-            android:parentActivityName=".HomeActivity"></activity>
+        <activity
+            android:name=".MainActivity"
+            android:parentActivityName=".HomeActivity" />
     </application>
 
 </manifest>
