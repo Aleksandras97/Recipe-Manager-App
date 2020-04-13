@@ -51,6 +51,37 @@
                 android:hint="@string/name_hint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:id="@+id/select_category"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
+                        android:text="@string/select_category" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/select_category"
+                        android:id="@+id/recycle_options">
+
+
+                    </androidx.recyclerview.widget.RecyclerView>
+                </RelativeLayout>
+
+            <EditText
+                android:id="@+id/recipeInstruction_detail"
+                android:hint="@string/category_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
             <EditText
                 android:id="@+id/recipeCategory_detail"
                 android:hint="@string/category_hint"

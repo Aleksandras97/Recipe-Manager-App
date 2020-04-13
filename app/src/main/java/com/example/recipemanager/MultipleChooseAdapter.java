@@ -20,7 +20,7 @@ public class MultipleChooseAdapter extends RecyclerView.Adapter<MultipleChooseAd
     Context context;
     List<Category> categoryList;
     SparseBooleanArray itemStateArray = new SparseBooleanArray();
-    List<Category> selectedCategotyList = new ArrayList<>();
+    List<Category> selectedCategoryList = new ArrayList<>();
 
     public MultipleChooseAdapter(Context context, List<Category> categoryList) {
         this.context = context;
@@ -39,9 +39,9 @@ public class MultipleChooseAdapter extends RecyclerView.Adapter<MultipleChooseAd
                     int adapterPosition = getAdapterPosition();
                     itemStateArray.put(adapterPosition, isChecked);
                     if (isChecked){
-                        selectedCategotyList.add(categoryList.get(adapterPosition));
+                        selectedCategoryList.add(categoryList.get(adapterPosition));
                     } else {
-                        selectedCategotyList.remove(categoryList.get(adapterPosition));
+                        selectedCategoryList.remove(categoryList.get(adapterPosition));
                     }
                 }
             });
@@ -71,7 +71,7 @@ public class MultipleChooseAdapter extends RecyclerView.Adapter<MultipleChooseAd
 
     public List<Integer> getFilterArray(){
         List<Integer> id_selected = new ArrayList<>();
-        for (Category category:selectedCategotyList){
+        for (Category category:selectedCategoryList){
             id_selected.add(category.getId());
         }
         return id_selected;

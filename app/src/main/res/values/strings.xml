@@ -11,6 +11,7 @@
     <string name="new_recipe">Create Recipe</string>
     <string name="crate_new_recipe">Create New Recipe</string>
     <string name="name_hint">Enter a name</string>
+    <string name="select_category">Select Categories</string>
     <string name="category_hint">Enter a category</string>
     <string name="search_recipe">Search</string>
     <string name="filter_recipe">Filter</string>

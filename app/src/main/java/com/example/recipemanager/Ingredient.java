@@ -4,25 +4,27 @@ public class Ingredient {
 
     private int id;
     private String name;
-    private int measure;
+    private String measure;
     private int recipe_id;
 
-    public Ingredient(String name, int measure) {
+    public Ingredient(String name, String measure, int recipe_id) {
         this.name = name;
         this.measure = measure;
+        this.recipe_id = recipe_id;
     }
 
-    public Ingredient(int id, String name, int measure) {
+    public Ingredient(int id, String name, String measure, int recipe_id) {
         this.id = id;
         this.name = name;
         this.measure = measure;
+        this.recipe_id = recipe_id;
     }
 
     public String getName() {
         return name;
     }
 
-    public int getMeasure() {
+    public String getMeasure() {
         return measure;
     }
 

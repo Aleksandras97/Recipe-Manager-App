@@ -99,19 +99,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (SQLException e){
             Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT).show();
         }
-
-
-
-
-//        recipeList.add(new Recipe("Blynai", "Pusryciai", R.drawable.homemadechickenpotpie));
-//        recipeList.add(new Recipe("diavolo", "Pica", R.drawable.diavolo));
-//        recipeList.add(new Recipe("funghi", "Pica", R.drawable.funghi));
-//        recipeList.add(new Recipe("Blynai", "Pusryciai", R.drawable.homemadechickenpotpie));
-//        recipeList.add(new Recipe("diavolo", "Pica", R.drawable.diavolo));
-//        recipeList.add(new Recipe("funghi", "Pica", R.drawable.funghi));
-//        recipeList.add(new Recipe("Blynai", "Pusryciai", R.drawable.homemadechickenpotpie));
-//        recipeList.add(new Recipe("diavolo", "Pica", R.drawable.diavolo));
-//        recipeList.add(new Recipe("funghi", "Pica", R.drawable.funghi));
     }
 
     private void setUpRecycleView() {
@@ -181,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
         LayoutInflater inflater = this.getLayoutInflater();
         View filter_layout = inflater.inflate(R.layout.dialog_options, null);
 
-//        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.select_dialog_item, categories);
         RecyclerView recycler_options = (RecyclerView) filter_layout.findViewById(R.id.recycle_options);
         recycler_options.setHasFixedSize(true);
         recycler_options.setLayoutManager(new LinearLayoutManager(this));
