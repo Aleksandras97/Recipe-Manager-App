@@ -42,15 +42,25 @@
 
         <LinearLayout
             android:layout_width="match_parent"
+            android:id="@+id/ll"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp" >
+
+
 
             <EditText
                 android:id="@+id/recipeName_detail"
                 android:hint="@string/name_hint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/recipeInstruction_detail"
+                android:hint="@string/instruction_hint"
+                android:gravity="top"
+                android:layout_width="match_parent"
+                android:layout_height="100dp" />
 
 
 
@@ -76,17 +86,44 @@
                     </androidx.recyclerview.widget.RecyclerView>
                 </RelativeLayout>
 
-            <EditText
-                android:id="@+id/recipeInstruction_detail"
-                android:hint="@string/category_hint"
+            <LinearLayout
+                android:id="@+id/rlForIngredient"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/recipeCategory_detail"
-                android:hint="@string/category_hint"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/recipeIngredient_detail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/ingredient_hint" />
+
+                    <EditText
+                        android:id="@+id/recipeMeasure_detail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/measure_hint" />
+
+
+                </LinearLayout>
+
+
+
+            </LinearLayout>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/add_ingredient"
+                android:layout_gravity="center_horizontal"
+                android:onClick="onAddNewIngredient"
+                style="@style/Widget.AppCompat.Button.Colored" />
+
 
             <ImageView
                 android:id="@+id/recipe_image"
@@ -107,6 +144,10 @@
 
 
         </LinearLayout>
+
+
+
+
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

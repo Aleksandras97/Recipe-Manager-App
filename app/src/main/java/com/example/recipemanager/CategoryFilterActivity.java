@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -41,57 +42,76 @@ public class CategoryFilterActivity extends AppCompatActivity {
     }
 
     private void fillRecipeList() {
-        recipeList = new ArrayList<>();
-        categoryList = new ArrayList<>();
-        recipeCategoryList = new ArrayList<>();
-        tempCategoryId = new ArrayList<>();
-        tempRecipeCategoryId = new ArrayList<>();
-        Intent intent = getIntent();
-        ArrayList<Integer> filteredList = intent.getIntegerArrayListExtra(EXTRA_FILTERARRAY);
+        new FillRecipeList().execute();
+    }
 
-        SQLiteOpenHelper recipeDatabaseHelper = new RecipeDatabaseHelper(this);
-        try {
-            SQLiteDatabase db = recipeDatabaseHelper.getReadableDatabase();
-            Cursor cursorRecipe = db.query ("RECIPE",
-                    new String[] {"_id", "NAME", "INSTRUCTION", "IMAGE_RESOURCE_ID"},
-                    null, null, null, null, null);
-            Cursor cursorRecipeCategory = db.query("RECIPECATEGORY",
-                    new String[] {"RECIPE_ID", "CAREGORY_ID"},
-                    null, null, null, null, null);
-            Cursor cursorCategory = db.query("CATEGORY",
-                    new String[] {"_id", "NAME"},
-                    null, null, null, null, null);
-            while(cursorCategory.moveToNext()){
-                int id = cursorCategory.getInt(0);
-                String name = cursorCategory.getString(1);
-                if (filteredList.contains(id)){
-                    categoryList.add(new Category(id, name));
-                    tempCategoryId.add(id);
-                }
-            }
-            while (cursorRecipeCategory.moveToNext()){
-                int recipeId = cursorRecipeCategory.getInt(0);
-                int category_id = cursorRecipeCategory.getInt(1);
-                if (tempCategoryId.contains(category_id)){
-                    recipeCategoryList.add(new RecipeCategory(recipeId, category_id));
-                    tempRecipeCategoryId.add(recipeId);
-                }
-            }
-            while (cursorRecipe.moveToNext()){
-                int id = cursorRecipe.getInt(0);
-                String name = cursorRecipe.getString(1);
-                String instruction = cursorRecipe.getString(2);
-                int photoId = cursorRecipe.getInt(3);
-                if (tempRecipeCategoryId.contains(id)){
-                    recipeList.add(new Recipe(id, name, instruction, photoId));
-                }
-            }
+    private class FillRecipeList extends AsyncTask<Integer, Void, Boolean>{
 
+        private ArrayList<Integer> filteredList;
+        protected void onPreExecute(){
+            recipeList = new ArrayList<>();
+            categoryList = new ArrayList<>();
+            recipeCategoryList = new ArrayList<>();
+            tempCategoryId = new ArrayList<>();
+            tempRecipeCategoryId = new ArrayList<>();
+            Intent intent = getIntent();
+            filteredList = intent.getIntegerArrayListExtra(EXTRA_FILTERARRAY);
+        }
 
-            cursorRecipe.close();
-            db.close();
-        } catch (SQLException e){
-            Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT).show();
+        @Override
+        protected Boolean doInBackground(Integer... integers) {
+            SQLiteOpenHelper recipeDatabaseHelper = new RecipeDatabaseHelper(CategoryFilterActivity.this);
+            try {
+                SQLiteDatabase db = recipeDatabaseHelper.getReadableDatabase();
+                Cursor cursorRecipe = db.query ("RECIPE",
+                        new String[] {"_id", "NAME", "INSTRUCTION", "IMAGE_RESOURCE_ID"},
+                        null, null, null, null, null);
+                Cursor cursorRecipeCategory = db.query("RECIPECATEGORY",
+                        new String[] {"RECIPE_ID", "CATEGORY_ID"},
+                        null, null, null, null, null);
+                Cursor cursorCategory = db.query("CATEGORY",
+                        new String[] {"_id", "NAME"},
+                        null, null, null, null, null);
+                while(cursorCategory.moveToNext()){
+                    int id = cursorCategory.getInt(0);
+                    String name = cursorCategory.getString(1);
+                    if (filteredList.contains(id)){
+                        categoryList.add(new Category(id, name));
+                        tempCategoryId.add(id);
+                    }
+                }
+                while (cursorRecipeCategory.moveToNext()){
+                    int recipeId = cursorRecipeCategory.getInt(0);
+                    int category_id = cursorRecipeCategory.getInt(1);
+                    if (tempCategoryId.contains(category_id)){
+                        recipeCategoryList.add(new RecipeCategory(recipeId, category_id));
+                        tempRecipeCategoryId.add(recipeId);
+                    }
+                }
+                while (cursorRecipe.moveToNext()){
+                    int id = cursorRecipe.getInt(0);
+                    String name = cursorRecipe.getString(1);
+                    String instruction = cursorRecipe.getString(2);
+                    int photoId = cursorRecipe.getInt(3);
+                    if (tempRecipeCategoryId.contains(id)){
+                        recipeList.add(new Recipe(id, name, instruction, photoId));
+                    }
+                }
+
+                cursorRecipeCategory.close();
+                cursorCategory.close();
+                cursorRecipe.close();
+                db.close();
+                return true;
+            } catch (SQLException e){
+                return false;
+            }
+        }
+
+        protected void onPostExecute(Boolean success){
+            if (!success){
+                Toast.makeText(CategoryFilterActivity.this, "Database unavailable", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
