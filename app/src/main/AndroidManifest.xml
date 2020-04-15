@@ -11,8 +11,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CategoryFilterActivity"
+        <activity android:name=".NewCategoryActivity"
             android:parentActivityName=".MainActivity"></activity>
+        <activity
+            android:name=".CategoryFilterActivity"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".NewRecipeActivity"
             android:label="@string/new_recipe"
@@ -27,6 +30,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MainActivity"
             android:parentActivityName=".HomeActivity" />

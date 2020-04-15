@@ -128,8 +128,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                             }
                         }
                     }
-
-                        if (categories.toLowerCase().contains(filterPattern) || item.getName().toLowerCase().contains(filterPattern)){
+                        if (categories.toLowerCase().contains(filterPattern) || item.getName().toLowerCase().trim().contains(filterPattern)){
                             filteredList.add(item);
                         }
                 }

@@ -9,6 +9,9 @@
     <string name="home_button">Recipes</string>
 
     <string name="new_recipe">Create Recipe</string>
+    <string name="new_category">Create Category</string>
+    <string name="category_hint">Enter Category Name</string>
+    <string name="create_category">Create Category</string>
     <string name="crate_new_recipe">Create New Recipe</string>
     <string name="name_hint">Enter a name</string>
     <string name="instruction_hint">Enter a Instruction</string>

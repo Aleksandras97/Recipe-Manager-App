@@ -15,15 +15,13 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.SearchView;
@@ -36,9 +34,6 @@ public class MainActivity extends AppCompatActivity {
     private List<Recipe> recipeList;
     private List<Category> categoryList;
     private List<RecipeCategory> recipeCategoryList;
-    private List<Ingredient> ingredientList;
-    public static final String EXTRA_NAME = "nameText";
-    public static final String EXTRA_CATEGORY = "categoryText";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,78 +46,49 @@ public class MainActivity extends AppCompatActivity {
 
         fillRecipeList();
         setUpRecycleView();
-
-        Intent intent = getIntent();
-        String nameText = intent.getStringExtra(EXTRA_NAME);
-        String categoryText = intent.getStringExtra(EXTRA_CATEGORY);
-        //insertRecipe(nameText, categoryText);
-    }
-
-    public void insertRecipe(String name, String category){
-        recipeList.add(new Recipe(name, category, R.drawable.ic_image));
-        adapter.notifyItemInserted(recipeList.size());
     }
 
     private void fillRecipeList() {
-        new FillDatabase().execute();
-    }
-
-    private class FillDatabase extends AsyncTask<Integer, Void, Boolean> {
-
-        protected void onPreExecute(){
-            recipeList = new ArrayList<>();
-            categoryList = new ArrayList<>();
-            recipeCategoryList = new ArrayList<>();
-        }
-
-        @Override
-        protected Boolean doInBackground(Integer... integers) {
-            SQLiteOpenHelper recipeDatabaseHelper = new RecipeDatabaseHelper(MainActivity.this);
-            try {
-                SQLiteDatabase db = recipeDatabaseHelper.getReadableDatabase();
-                Cursor cursorRecipe = db.query ("RECIPE",
-                        new String[] {"_id", "NAME", "INSTRUCTION", "IMAGE_RESOURCE_ID"},
-                        null, null, null, null, null);
-                Cursor cursorRecipeCategory = db.query("RECIPECATEGORY",
-                        new String[] {"RECIPE_ID", "CATEGORY_ID"},
-                        null, null, null, null, null);
-                Cursor cursorCategory = db.query("CATEGORY",
-                        new String[] {"_id", "NAME"},
-                        null, null, null, null, null);
-                while (cursorRecipe.moveToNext()){
-                    int id = cursorRecipe.getInt(0);
-                    String name = cursorRecipe.getString(1);
-                    String instruction = cursorRecipe.getString(2);
-                    int photoId = cursorRecipe.getInt(3);
-                    recipeList.add(new Recipe(id, name, instruction, photoId));
-                }
-                while(cursorCategory.moveToNext()){
-                    int id = cursorCategory.getInt(0);
-                    String name = cursorCategory.getString(1);
-                    categoryList.add(new Category(id, name));
-                }
-                while (cursorRecipeCategory.moveToNext()){
-                    int recipeId = cursorRecipeCategory.getInt(0);
-                    int category_id = cursorRecipeCategory.getInt(1);
-                    recipeCategoryList.add(new RecipeCategory(recipeId, category_id));
-                }
-                cursorRecipe.close();
-                cursorCategory.close();
-                cursorRecipeCategory.close();
-                db.close();
-                return true;
-            } catch (SQLException e){
-                return false;
+        recipeList = new ArrayList<>();
+        categoryList = new ArrayList<>();
+        recipeCategoryList = new ArrayList<>();
+        SQLiteOpenHelper recipeDatabaseHelper = new RecipeDatabaseHelper(MainActivity.this);
+        try {
+            SQLiteDatabase db = recipeDatabaseHelper.getReadableDatabase();
+            Cursor cursorRecipe = db.query ("RECIPE",
+                    new String[] {"_id", "NAME", "INSTRUCTION", "IMAGE_RESOURCE_ID"},
+                    null, null, null, null, null);
+            Cursor cursorRecipeCategory = db.query("RECIPECATEGORY",
+                    new String[] {"RECIPE_ID", "CATEGORY_ID"},
+                    null, null, null, null, null);
+            Cursor cursorCategory = db.query("CATEGORY",
+                    new String[] {"_id", "NAME"},
+                    null, null, null, null, null);
+            while (cursorRecipe.moveToNext()){
+                int id = cursorRecipe.getInt(0);
+                String name = cursorRecipe.getString(1);
+                String instruction = cursorRecipe.getString(2);
+                int photoId = cursorRecipe.getInt(3);
+                recipeList.add(new Recipe(id, name, instruction, photoId));
             }
-        }
-
-        protected void onPostExecute(Boolean success) {
-            if (!success){
-                Toast.makeText(MainActivity.this, "Database unavailable", Toast.LENGTH_SHORT).show();
+            while(cursorCategory.moveToNext()){
+                int id = cursorCategory.getInt(0);
+                String name = cursorCategory.getString(1);
+                categoryList.add(new Category(id, name));
             }
+            while (cursorRecipeCategory.moveToNext()){
+                int recipeId = cursorRecipeCategory.getInt(0);
+                int category_id = cursorRecipeCategory.getInt(1);
+                recipeCategoryList.add(new RecipeCategory(recipeId, category_id));
+            }
+            cursorRecipe.close();
+            cursorCategory.close();
+            cursorRecipeCategory.close();
+            db.close();
+        } catch (SQLException e){
+            Toast.makeText(MainActivity.this, "Database unavailable", Toast.LENGTH_SHORT).show();
+
         }
-
-
     }
 
 
@@ -154,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -178,6 +145,11 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_filter:
                 showOptionsDialog();
+                return true;
+            case R.id.action_create_category:
+                Intent intent1 = new Intent(this, NewCategoryActivity.class);
+                startActivity(intent1);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

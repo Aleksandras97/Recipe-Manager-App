@@ -16,11 +16,18 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:enabled="true"
-        android:title="@string/filter_recipe"
-        android:icon="@drawable/ic_filter"
-        app:showAsAction="ifRoom"
-        android:id="@+id/action_filter" />
+        android:id="@+id/action_create_category"
+        android:title="@string/new_category"
+        android:icon="@drawable/ic_add_white_24dp"
+        android:orderInCategory="2"
+        app:showAsAction="ifRoom" />
+
+    <item
+    android:enabled="true"
+    android:title="@string/filter_recipe"
+    android:icon="@drawable/ic_filter"
+    app:showAsAction="ifRoom"
+    android:id="@+id/action_filter" />
 
 
 </menu>

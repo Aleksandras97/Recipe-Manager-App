@@ -143,7 +143,7 @@ public class NewRecipeActivity extends AppCompatActivity {
             ContentValues recipeValues = new ContentValues();
             recipeValues.put("NAME", nameText);
             recipeValues.put("INSTRUCTION", instructionText);
-            recipeValues.put("IMAGE_RESOURCE_ID", R.drawable.ic_image);
+            recipeValues.put("IMAGE_RESOURCE_ID", R.drawable.pineapplepizza);
             db.insert("RECIPE", null, recipeValues);
             db.close();
         } catch (SQLException e){
@@ -217,6 +217,8 @@ public class NewRecipeActivity extends AppCompatActivity {
             }
         });
         snackbar.show();
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
     private void pickImageFromGallery() {

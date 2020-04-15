@@ -1,0 +1,624 @@
+[33mcommit 36d468c725fa32202b6012b9ba0270abb627258e[m[33m ([m[1;36mHEAD -> [m[1;32mRecipe-Manager_SQL[m[33m)[m
+Author: Aleksandras97 <aleksandrnarusevic1@gmail.com>
+Date:   Wed Apr 15 00:18:44 2020 +0300
+
+    Implemented Add New Recipe
+
+[1mdiff --git a/app/src/main/java/com/example/recipemanager/CategoryFilterActivity.java b/app/src/main/java/com/example/recipemanager/CategoryFilterActivity.java[m
+[1mindex f9b167e..27faec3 100644[m
+[1m--- a/app/src/main/java/com/example/recipemanager/CategoryFilterActivity.java[m
+[1m+++ b/app/src/main/java/com/example/recipemanager/CategoryFilterActivity.java[m
+[36m@@ -11,6 +11,7 @@[m [mimport android.database.Cursor;[m
+ import android.database.SQLException;[m
+ import android.database.sqlite.SQLiteDatabase;[m
+ import android.database.sqlite.SQLiteOpenHelper;[m
+[32m+[m[32mimport android.os.AsyncTask;[m
+ import android.os.Bundle;[m
+ import android.widget.Toast;[m
+ [m
+[36m@@ -41,57 +42,76 @@[m [mpublic class CategoryFilterActivity extends AppCompatActivity {[m
+     }[m
+ [m
+     private void fillRecipeList() {[m
+[31m-        recipeList = new ArrayList<>();[m
+[31m-        categoryList = new ArrayList<>();[m
+[31m-        recipeCategoryList = new ArrayList<>();[m
+[31m-        tempCategoryId = new ArrayList<>();[m
+[31m-        tempRecipeCategoryId = new ArrayList<>();[m
+[31m-        Intent intent = getIntent();[m
+[31m-        ArrayList<Integer> filteredList = intent.getIntegerArrayListExtra(EXTRA_FILTERARRAY);[m
+[31m-[m
+[31m-        SQLiteOpenHelper recipeDatabaseHelper = new RecipeDatabaseHelper(this);[m
+[31m-        try {[m
+[31m-            SQLiteDatabase db = recipeDatabaseHelper.getReadableDatabase();[m
+[31m-            Cursor cursorRecipe = db.query ("RECIPE",[m
+[31m-                    new String[] {"_id", "NAME", "INSTRUCTION", "IMAGE_RESOURCE_ID"},[m
+[31m-                    null, null, null, null, null);[m
+[31m-            Cursor cursorRecipeCategory = db.query("RECIPECATEGORY",[m
+[31m-                    new String[] {"RECIPE_ID", "CAREGORY_ID"},[m
+[31m-                    null, null, null, null, null);[m
+[31m-            Cursor cursorCategory = db.query("CATEGORY",[m
+[31m-                    new String[] {"_id", "NAME"},[m
+[31m-                    null, null, null, null, null);[m
+[31m-            while(cursorCategory.moveToNext()){[m
+[31m-                int id = cursorCategory.getInt(0);[m
+[31m-                String name = cursorCategory.getString(1);[m
+[31m-                if (filteredList.contains(id)){[m
+[31m-                    categoryList.add(new Category(id, name));[m
+[31m-                    tempCategoryId.add(id);[m
+[32m+[m[32m        new FillRecipeList().execute();[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    private class FillRecipeList extends AsyncTask<Integer, Void, Boolean>{[m
+[32m+[m
+[32m+[m[32m        private ArrayList<Integer> filteredList;[m
+[32m+[m[32m        protected void onPreExecute(){[m
+[32m+[m[32m            recipeList = new ArrayList<>();[m
+[32m+[m[32m            categoryList = new ArrayList<>();[m
+[32m+[m[32m            recipeCategoryList = new ArrayList<>();[m
+[32m+[m[32m            tempCategoryId = new ArrayList<>();[m
+[32m+[m[32m            tempRecipeCategoryId = new ArrayList<>();[m
+[32m+[m[32m            Intent intent = getIntent();[m
+[32m+[m[32m            filteredList = intent.getIntegerArrayListExtra(EXTRA_FILTERARRAY);[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        @Override[m
+[32m+[m[32m        protected Boolean doInBackground(Integer... integers) {[m
+[32m+[m[32m            SQLiteOpenHelper recipeDatabaseHelper = new RecipeDatabaseHelper(CategoryFilterActivity.this);[m
+[32m+[m[32m            try {[m
+[32m+[m[32m                SQLiteDatabase db = recipeDatabaseHelper.getReadableDatabase();[m
+[32m+[m[32m                Cursor cursorRecipe = db.query ("RECIPE",[m
+[32m+[m[32m                        new String[] {"_id", "NAME", "INSTRUCTION", "IMAGE_RESOURCE_ID"},[m
+[32m+[m[32m                        null, null, null, null, null);[m
+[32m+[m[32m                Cursor cursorRecipeCategory = db.query("RECIPECATEGORY",[m
+[32m+[m[32m                        new String[] {"RECIPE_ID", "CATEGORY_ID"},[m
+[32m+[m[32m                        null, null, null, null, null);[m
+[32m+[m[32m                Cursor cursorCategory = db.query("CATEGORY",[m
+[32m+[m[32m                        new String[] {"_id", "NAME"},[m
+[32m+[m[32m                        null, null, null, null, null);[m
+[32m+[m[32m                while(cursorCategory.moveToNext()){[m
+[32m+[m[32m                    int id = cursorCategory.getInt(0);[m
+[32m+[m[32m                    String name = cursorCategory.getString(1);[m
+[32m+[m[32m                    if (filteredList.contains(id)){[m
+[32m+[m[32m                        categoryList.add(new Category(id, name));[m
+[32m+[m[32m                        tempCategoryId.add(id);[m
+[32m+[m[32m                    }[m
+                 }[m
+[31m-            }[m
+[31m-            while (cursorRecipeCategory.moveToNext()){[m
+[31m-                int recipeId = cursorRecipeCategory.getInt(0);[m
+[31m-                int category_id = cursorRecipeCategory.getInt(1);[m
+[31m-                if (tempCategoryId.contains(category_id)){[m
+[31m-                    recipeCategoryList.add(new RecipeCategory(recipeId, category_id));[m
+[31m-                    tempRecipeCategoryId.add(recipeId);[m
+[32m+[m[32m                while (cursorRecipeCategory.moveToNext()){[m
+[32m+[m[32m                    int recipeId = cursorRecipeCategory.getInt(0);[m
+[32m+[m[32m                    int category_id = cursorRecipeCategory.getInt(1);[m
+[32m+[m[32m                    if (tempCategoryId.contains(category_id)){[m
+[32m+[m[32m                        recipeCategoryList.add(new RecipeCategory(recipeId, category_id));[m
+[32m+[m[32m                        tempRecipeCategoryId.add(recipeId);[m
+[32m+[m[32m                    }[m
+                 }[m
+[31m-            }[m
+[31m-            while (cursorRecipe.moveToNext()){[m
+[31m-                int id = cursorRecipe.getInt(0);[m
+[31m-                String name = cursorRecipe.getString(1);[m
+[31m-                String instruction = cursorRecipe.getString(2);[m
+[31m-                int photoId = cursorRecipe.getInt(3);[m
+[31m-                if (tempRecipeCategoryId.contains(id)){[m
+[31m-                    recipeList.add(new Recipe(id, name, instruction, photoId));[m
+[32m+[m[32m                while (cursorRecipe.moveToNext()){[m
+[32m+[m[32m                    int id = cursorRecipe.getInt(0);[m
+[32m+[m[32m                    String name = cursorRecipe.getString(1);[m
+[32m+[m[32m                    String instruction = cursorRecipe.getString(2);[m
+[32m+[m[32m                    int photoId = cursorRecipe.getInt(3);[m
+[32m+[m[32m                    if (tempRecipeCategoryId.contains(id)){[m
+[32m+[m[32m                        recipeList.add(new Recipe(id, name, instruction, photoId));[m
+[32m+[m[32m                    }[m
+                 }[m
+[31m-            }[m
+ [m
+[32m+[m[32m                cursorRecipeCategory.close();[m
+[32m+[m[32m                cursorCategory.close();[m
+[32m+[m[32m                cursorRecipe.close();[m
+[32m+[m[32m                db.close();[m
+[32m+[m[32m                return true;[m
+[32m+[m[32m            } catch (SQLException e){[m
+[32m+[m[32m                return false;[m
+[32m+[m[32m            }[m
+[32m+[m[32m        }[m
+ [m
+[31m-            cursorRecipe.close();[m
+[31m-            db.close();[m
+[31m-        } catch (SQLException e){[m
+[31m-            Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT).show();[m
+[32m+[m[32m        protected void onPostExecute(Boolean success){[m
+[32m+[m[32m            if (!success){[m
+[32m+[m[32m                Toast.makeText(CategoryFilterActivity.this, "Database unavailable", Toast.LENGTH_SHORT).show();[m
+[32m+[m[32m            }[m
+         }[m
+     }[m
+ [m
+[1mdiff --git a/app/src/main/java/com/example/recipemanager/MainActivity.java b/app/src/main/java/com/example/recipemanager/MainActivity.java[m
+[1mindex 305aa2d..878c3aa 100644[m
+[1m--- a/app/src/main/java/com/example/recipemanager/MainActivity.java[m
+[1m+++ b/app/src/main/java/com/example/recipemanager/MainActivity.java[m
+[36m@@ -5,6 +5,7 @@[m [mimport androidx.appcompat.app.ActionBar;[m
+ import androidx.appcompat.app.AlertDialog;[m
+ import androidx.appcompat.app.AppCompatActivity;[m
+ import androidx.appcompat.widget.Toolbar;[m
+[32m+[m[32mimport androidx.recyclerview.widget.GridLayoutManager;[m
+ import androidx.recyclerview.widget.LinearLayoutManager;[m
+ import androidx.recyclerview.widget.RecyclerView;[m
+ [m
+[36m@@ -14,6 +15,7 @@[m [mimport android.database.Cursor;[m
+ import android.database.SQLException;[m
+ import android.database.sqlite.SQLiteDatabase;[m
+ import android.database.sqlite.SQLiteOpenHelper;[m
+[32m+[m[32mimport android.os.AsyncTask;[m
+ import android.os.Bundle;[m
+ import android.view.LayoutInflater;[m
+ import android.view.Menu;[m
+[36m@@ -62,45 +64,69 @@[m [mpublic class MainActivity extends AppCompatActivity {[m
+     }[m
+ [m
+     private void fillRecipeList() {[m
+[31m-        recipeList = new ArrayList<>();[m
+[31m-        categoryList = new ArrayList<>();[m
+[31m-        recipeCategoryList = new ArrayList<>();[m
+[31m-        SQLiteOpenHelper recipeDatabaseHelper = new RecipeDatabaseHelper(this);[m
+[31m-        try {[m
+[31m-            SQLiteDatabase db = recipeDatabaseHelper.getReadableDatabase();[m
+[31m-            Cursor cursorRecipe = db.query ("RECIPE",[m
+[31m-                    new String[] {"_id", "NAME", "INSTRUCTION", "IMAGE_RESOURCE_ID"},[m
+[31m-                    null, null, null, null, null);[m
+[31m-            Cursor cursorRecipeCategory = db.query("RECIPECATEGORY",[m
+[31m-                    new String[] {"RECIPE_ID", "CAREGORY_ID"},[m
+[31m-                    null, null, null, null, null);[m
+[31m-            Cursor cursorCategory = db.query("CATEGORY",[m
+[31m-                    new String[] {"_id", "NAME"},[m
+[31m-                    null, null, null, null, null);[m
+[31m-            while (cursorRecipe.moveToNext()){[m
+[32m+[m[32m        new FillDatabase().execute();[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    private class FillDatabase extends AsyncTask<Integer, Void, Boolean> {[m
+[32m+[m
+[32m+[m[32m        protected void onPreExecute(){[m
+[32m+[m[32m            recipeList = new ArrayList<>();[m
+[32m+[m[32m            categoryList = new ArrayList<>();[m
+[32m+[m[32m            recipeCategoryList = new ArrayList<>();[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        @Override[m
+[32m+[m[32m        protected Boolean doInBackground(Integer... integers) {[m
+[32m+[m[32m            SQLiteOpenHelper recipeDatabaseHelper = new RecipeDatabaseHelper(MainActivity.this);[m
+[32m+[m[32m            try {[m
+[32m+[m[32m                SQLiteDatabase db = recipeDatabaseHelper.getReadableDatabase();[m
+[32m+[m[32m                Cursor cursorRecipe = db.query ("RECIPE",[m
+[32m+[m[32m                        new String[] {"_id", "NAME", "INSTRUCTION", "IMAGE_RESOURCE_ID"},[m
+[32m+[m[32m                        null, null, null, null, null);[m
+[32m+[m[32m                Cursor cursorRecipeCategory = db.query("RECIPECATEGORY",[m
+[32m+[m[32m                        new String[] {"RECIPE_ID", "CATEGORY_ID"},[m
+[32m+[m[32m                        null, null, null, null, null);[m
+[32m+[m[32m                Cursor cursorCategory = db.query("CATEGORY",[m
+[32m+[m[32m                        new String[] {"_id", "NAME"},[m
+[32m+[m[32m                        null, null, null, null, null);[m
+[32m+[m[32m                while (cursorRecipe.moveToNext()){[m
+                     int id = cursorRecipe.getInt(0);[m
+                     String name = cursorRecipe.getString(1);[m
+                     String instruction = cursorRecipe.getString(2);[m
+                     int photoId = cursorRecipe.getInt(3);[m
+                     recipeList.add(new Recipe(id, name, instruction, photoId));[m
+[32m+[m[32m                }[m
+[32m+[m[32m                while(cursorCategory.moveToNext()){[m
+[32m+[m[32m                    int id = cursorCategory.getInt(0);[m
+[32m+[m[32m                    String name = cursorCategory.getString(1);[m
+[32m+[m[32m                    categoryList.add(new Category(id, name));[m
+[32m+[m[32m                }[m
+[32m+[m[32m                while (cursorRecipeCategory.moveToNext()){[m
+[32m+[m[32m                    int recipeId = cursorRecipeCategory.getInt(0);[m
+[32m+[m[32m                    int category_id = cursorRecipeCategory.getInt(1);[m
+[32m+[m[32m                    recipeCategoryList.add(new RecipeCategory(recipeId, category_id));[m
+[32m+[m[32m                }[m
+[32m+[m[32m                cursorRecipe.close();[m
+[32m+[m[32m                cursorCategory.close();[m
+[32m+[m[32m                cursorRecipeCategory.close();[m
+[32m+[m[32m                db.close();[m
+[32m+[m[32m                return true;[m
+[32m+[m[32m            } catch (SQLException e){[m
+[32m+[m[32m                return false;[m
+             }[m
+[31m-            while(cursorCategory.moveToNext()){[m
+[31m-                int id = cursorCategory.getInt(0);[m
+[31m-                String name = cursorCategory.getString(1);[m
+[31m-                categoryList.add(new Category(id, name));[m
+[31m-            }[m
+[31m-            while (cursorRecipeCategory.moveToNext()){[m
+[31m-                int recipeId = cursorRecipeCategory.getInt(0);[m
+[31m-                int category_id = cursorRecipeCategory.getInt(1);[m
+[31m-                recipeCategoryList.add(new RecipeCategory(recipeId, category_id));[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        protected void onPostExecute(Boolean success) {[m
+[32m+[m[32m            if (!success){[m
+[32m+[m[32m                Toast.makeText(MainActivity.this, "Database unavailable", Toast.LENGTH_SHORT).show();[m
+             }[m
+[31m-            cursorRecipe.close();[m
+[31m-            db.close();[m
+[31m-        } catch (SQLException e){[m
+[31m-            Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT).show();[m
+         }[m
+[32m+[m
+[32m+[m
+     }[m
+ [m
+[32m+[m
+[32m+[m
+     private void setUpRecycleView() {[m
+         RecyclerView recyclerView = findViewById(R.id.recycle_view);[m
+         recyclerView.setHasFixedSize(true);[m
+[36m@@ -152,7 +178,6 @@[m [mpublic class MainActivity extends AppCompatActivity {[m
+                 return true;[m
+             case R.id.action_filter:[m
+                 showOptionsDialog();[m
+[31m-//                startActivity(new Intent(this, CategoryFilterActivity.class));[m
+             default:[m
+                 return super.onOptionsItemSelected(item);[m
+         }[m
+[36m@@ -170,7 +195,7 @@[m [mpublic class MainActivity extends AppCompatActivity {[m
+ [m
+         RecyclerView recycler_options = (RecyclerView) filter_layout.findViewById(R.id.recycle_options);[m
+         recycler_options.setHasFixedSize(true);[m
+[31m-        recycler_options.setLayoutManager(new LinearLayoutManager(this));[m
+[32m+[m[32m        recycler_options.setLayoutManager(new GridLayoutManager(this, 2));[m
+         final MultipleChooseAdapter adapter = new MultipleChooseAdapter(getBaseContext(), categoryList);[m
+         recycler_options.setAdapter(adapter);[m
+ [m
+[1mdiff --git a/app/src/main/java/com/example/recipemanager/NewRecipeActivity.java b/app/src/main/java/com/example/recipemanager/NewRecipeActivity.java[m
+[1mindex 88a5e97..110964a 100644[m
+[1m--- a/app/src/main/java/com/example/recipemanager/NewRecipeActivity.java[m
+[1m+++ b/app/src/main/java/com/example/recipemanager/NewRecipeActivity.java[m
+[36m@@ -6,11 +6,13 @@[m [mimport androidx.appcompat.app.ActionBar;[m
+ import androidx.appcompat.app.AlertDialog;[m
+ import androidx.appcompat.app.AppCompatActivity;[m
+ import androidx.appcompat.widget.Toolbar;[m
+[32m+[m[32mimport androidx.core.widget.NestedScrollView;[m
+ import androidx.recyclerview.widget.GridLayoutManager;[m
+ import androidx.recyclerview.widget.LinearLayoutManager;[m
+ import androidx.recyclerview.widget.RecyclerView;[m
+ [m
+ import android.Manifest;[m
+[32m+[m[32mimport android.content.ContentValues;[m
+ import android.content.DialogInterface;[m
+ import android.content.Intent;[m
+ import android.content.pm.PackageManager;[m
+[36m@@ -20,11 +22,15 @@[m [mimport android.database.sqlite.SQLiteDatabase;[m
+ import android.database.sqlite.SQLiteOpenHelper;[m
+ import android.os.Build;[m
+ import android.os.Bundle;[m
+[32m+[m[32mimport android.util.Log;[m
+ import android.view.LayoutInflater;[m
+ import android.view.View;[m
+[32m+[m[32mimport android.view.ViewGroup;[m
+ import android.widget.Button;[m
+ import android.widget.EditText;[m
+ import android.widget.ImageView;[m
+[32m+[m[32mimport android.widget.LinearLayout;[m
+[32m+[m[32mimport android.widget.RelativeLayout;[m
+ import android.widget.Toast;[m
+ [m
+ import com.google.android.material.snackbar.Snackbar;[m
+[36m@@ -36,6 +42,10 @@[m [mpublic class NewRecipeActivity extends AppCompatActivity {[m
+ [m
+     ImageView chooseImage;[m
+     Button chooseButton;[m
+[32m+[m[32m    private ArrayList<Integer> idsIngredients = new ArrayList<>();[m
+[32m+[m[32m    private ArrayList<Integer> idsMeasures = new ArrayList<>();[m
+[32m+[m[32m    private int recipeId;[m
+[32m+[m[32m    private List<Integer> selectedCategoryList;[m
+     private List<Category> categoryList;[m
+     private MultipleChooseAdapter adapter;[m
+     private static final int PERMISION_CODE = 1001;[m
+[36m@@ -57,6 +67,7 @@[m [mpublic class NewRecipeActivity extends AppCompatActivity {[m
+         fillCategoryList();[m
+         OptionsForCategory();[m
+ [m
+[32m+[m
+         //Handle button click[m
+         chooseButton.setOnClickListener(new View.OnClickListener() {[m
+             @Override[m
+[36m@@ -81,40 +92,122 @@[m [mpublic class NewRecipeActivity extends AppCompatActivity {[m
+         });[m
+     }[m
+ [m
+[31m-    private void OptionsForCategory() {[m
+[32m+[m[32m    public void onAddNewIngredient(View view){[m
+[32m+[m[32m        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.rlForIngredient);[m
+[32m+[m[32m        LinearLayout linearLayoutHorizontal = new LinearLayout(this);[m
+[32m+[m
+[32m+[m[32m        EditText etIngredient = new EditText(this);[m
+[32m+[m[32m        etIngredient.setHint(R.string.ingredient_hint);[m
+[32m+[m[32m        LinearLayout.LayoutParams lpIng = new LinearLayout.LayoutParams([m
+[32m+[m[32m                ViewGroup.LayoutParams.WRAP_CONTENT,[m
+[32m+[m[32m                ViewGroup.LayoutParams.WRAP_CONTENT);[m
+[32m+[m[32m        etIngredient.setId(View.generateViewId());[m
+[32m+[m[32m        idsIngredients.add(etIngredient.getId());[m
+[32m+[m[32m        linearLayoutHorizontal.addView(etIngredient, lpIng);[m
+[32m+[m
+ [m
+[31m-        //LayoutInflater inflater = this.getLayoutInflater();[m
+[31m-        //View filter_layout = inflater.inflate(R.layout.dialog_options, null);[m
+[32m+[m[32m        EditText etMeasure = new EditText(this);[m
+[32m+[m[32m        etMeasure.setHint(R.string.measure_hint);[m
+[32m+[m[32m        RelativeLayout.LayoutParams lpMea = new RelativeLayout.LayoutParams([m
+[32m+[m[32m                ViewGroup.LayoutParams.WRAP_CONTENT,[m
+[32m+[m[32m                ViewGroup.LayoutParams.WRAP_CONTENT);[m
+[32m+[m[32m        etMeasure.setId(View.generateViewId());[m
+[32m+[m[32m        linearLayoutHorizontal.addView(etMeasure, lpMea);[m
+[32m+[m[32m        idsMeasures.add(etMeasure.getId());[m
+[32m+[m[32m        linearLayout.addView(linearLayoutHorizontal);[m
+[32m+[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    private void OptionsForCategory() {[m
+ [m
+         RecyclerView recycler_options = (RecyclerView) findViewById(R.id.recycle_options);[m
+         recycler_options.setHasFixedSize(true);[m
+         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 3);[m
+[31m-        //recycler_options.setLayoutManager(new LinearLayoutManager(this));[m
+[31m-        final MultipleChooseAdapter adapter = new MultipleChooseAdapter(getBaseContext(), categoryList);[m
+[32m+[m[32m        adapter = new MultipleChooseAdapter(getBaseContext(), categoryList);[m
+         recycler_options.setLayoutManager(layoutManager);[m
+         recycler_options.setAdapter(adapter);[m
+[31m-        //recycler_options.set[m
+[31m-        //alertDialog.setView(filter_layout);[m
+     }[m
+ [m
+     public void onClickDone(View view){[m
+[32m+[m[32m        selectedCategoryList = adapter.getFilterArray();[m
+         EditText nameView = (EditText) findViewById(R.id.recipeName_detail);[m
+         String nameText = nameView.getText().toString();[m
+[31m-        EditText categoryView = (EditText) findViewById(R.id.recipeCategory_detail);[m
+[31m-        String categoryText = categoryView.getText().toString();[m
+[32m+[m[32m        EditText instructionView = (EditText) findViewById(R.id.recipeInstruction_detail);[m
+[32m+[m[32m        String instructionText = instructionView.getText().toString();[m
+[32m+[m
+[32m+[m
+[32m+[m
+         SQLiteOpenHelper recipeDatabaseHelper = new RecipeDatabaseHelper(this);[m
+         try{[m
+[32m+[m[32m            SQLiteDatabase db = recipeDatabaseHelper.getWritableDatabase();[m
+[32m+[m[32m            ContentValues recipeValues = new ContentValues();[m
+[32m+[m[32m            recipeValues.put("NAME", nameText);[m
+[32m+[m[32m            recipeValues.put("INSTRUCTION", instructionText);[m
+[32m+[m[32m            recipeValues.put("IMAGE_RESOURCE_ID", R.drawable.ic_image);[m
+[32m+[m[32m            db.insert("RECIPE", null, recipeValues);[m
+[32m+[m[32m            db.close();[m
+[32m+[m[32m        } catch (SQLException e){[m
+[32m+[m[32m            Toast.makeText(this, "Database unavailable 1", Toast.LENGTH_SHORT).show();[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        try {[m
+             SQLiteDatabase db = recipeDatabaseHelper.getReadableDatabase();[m
+[32m+[m[32m            Cursor cursorRecipeId = db.rawQuery("SELECT RECIPE._id FROM RECIPE WHERE RECIPE.NAME = '"+ nameText+"'", null);[m
+[32m+[m[32m            if (cursorRecipeId.moveToFirst()){[m
+[32m+[m[32m                recipeId = cursorRecipeId.getInt(0);[m
+[32m+[m[32m            }[m
+[32m+[m[32m            cursorRecipeId.close();[m
+[32m+[m[32m            db.close();[m
+[32m+[m[32m        } catch (SQLException e){[m
+[32m+[m[32m            Toast.makeText(this, "Database unavailable 2", Toast.LENGTH_SHORT).show();[m
+[32m+[m[32m        }[m
+ [m
+[32m+[m[32m        try {[m
+[32m+[m[32m            SQLiteDatabase db = recipeDatabaseHelper.getWritableDatabase();[m
+[32m+[m[32m            for (Integer categoryId : selectedCategoryList){[m
+[32m+[m[32m                ContentValues recipeCategoryValues = new ContentValues();[m
+[32m+[m[32m                recipeCategoryValues.put("RECIPE_ID", recipeId);[m
+[32m+[m[32m                recipeCategoryValues.put("CATEGORY_ID", categoryId);[m
+[32m+[m[32m                db.insert("RECIPECATEGORY", null, recipeCategoryValues);[m
+[32m+[m[32m                recipeCategoryValues.clear();[m
+[32m+[m[32m            }[m
+[32m+[m[32m            db.close();[m
+         } catch (SQLException e){[m
+[31m-            Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT).show();[m
+[32m+[m[32m            Toast.makeText(this, "Database unavailable 3", Toast.LENGTH_SHORT).show();[m
+         }[m
+ [m
+[32m+[m[32m        EditText ingredientView = (EditText) findViewById(R.id.recipeIngredient_detail);[m
+[32m+[m[32m        String ingredientText = ingredientView.getText().toString();[m
+[32m+[m[32m        EditText measureView = (EditText) findViewById(R.id.recipeMeasure_detail);[m
+[32m+[m[32m        String measureText = measureView.getText().toString();[m
+[32m+[m[32m        try {[m
+[32m+[m[32m            SQLiteDatabase db = recipeDatabaseHelper.getWritableDatabase();[m
+[32m+[m[32m            ContentValues ingredientValues = new ContentValues();[m
+[32m+[m[32m            ingredientValues.put("NAME", ingredientText);[m
+[32m+[m[32m            ingredientValues.put("MEASURE", measureText);[m
+[32m+[m[32m            ingredientValues.put("RECIPE_ID", recipeId);[m
+[32m+[m[32m            db.insert("INGREDIENT", null, ingredientValues);[m
+[32m+[m[32m            if (idsIngredients != null && idsMeasures != null){[m
+[32m+[m[32m                for (int i = 0; i < idsIngredients.size(); i++){[m
+[32m+[m
+[32m+[m[32m                    EditText addedIngredientView = (EditText) findViewById(idsIngredients.get(i));[m
+[32m+[m[32m                    String addedIngredientText = addedIngredientView.getText().toString();[m
+[32m+[m[32m                    EditText addedMeasureView = (EditText) findViewById(idsMeasures.get(i));[m
+[32m+[m[32m                    String addedMeasureText = addedIngredientView.getText().toString();[m
+[32m+[m[32m                    ContentValues addedIngredientValues = new ContentValues();[m
+[32m+[m[32m                    addedIngredientValues.put("NAME", addedIngredientText);[m
+[32m+[m[32m                    addedIngredientValues.put("MEASURE", addedMeasureText);[m
+[32m+[m[32m                    addedIngredientValues.put("RECIPE_ID", recipeId);[m
+[32m+[m[32m                    db.insert("INGREDIENT", null, addedIngredientValues);[m
+ [m
+[31m-        Intent intent = new Intent(this, MainActivity.class);[m
+[31m-        intent.putExtra(MainActivity.EXTRA_NAME, nameText);[m
+[31m-        intent.putExtra(MainActivity.EXTRA_CATEGORY, categoryText);[m
+[31m-        startActivity(intent);[m
+[32m+[m[32m                }[m
+[32m+[m[32m                db.close();[m
+[32m+[m[32m            } else {[m
+[32m+[m[32m                Toast.makeText(this, "No Ingredients Passed", Toast.LENGTH_SHORT).show();[m
+[32m+[m[32m            }[m
+[32m+[m[32m        } catch (SQLException e){[m
+[32m+[m[32m            Toast.makeText(this, "Database unavailable 4", Toast.LENGTH_SHORT).show();[m
+[32m+[m[32m        }[m
+ [m
+         Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinator), "New Recipe created!", Snackbar.LENGTH_SHORT);[m
+         snackbar.setAction("Undo", new View.OnClickListener() {[m
+[1mdiff --git a/app/src/main/java/com/example/recipemanager/RecipeDatabaseHelper.java b/app/src/main/java/com/example/recipemanager/RecipeDatabaseHelper.java[m
+[1mindex 3d5259a..34c8490 100644[m
+[1m--- a/app/src/main/java/com/example/recipemanager/RecipeDatabaseHelper.java[m
+[1m+++ b/app/src/main/java/com/example/recipemanager/RecipeDatabaseHelper.java[m
+[36m@@ -43,9 +43,9 @@[m [mpublic class RecipeDatabaseHelper extends SQLiteOpenHelper {[m
+             db.execSQL("CREATE TABLE "+ CATEGORY +" (_id INTEGER PRIMARY KEY AUTOINCREMENT," +[m
+                     "NAME STRING);");[m
+             db.execSQL("CREATE TABLE " + RECIPECATEGORY + " (RECIPE_ID INTEGER,  "[m
+[31m-                    + "CAREGORY_ID INTEGER,"[m
+[32m+[m[32m                    + "CATEGORY_ID INTEGER,"[m
+                     + "FOREIGN KEY(RECIPE_ID) REFERENCES " + RECIPE + "(_id),"[m
+[31m-                    + "FOREIGN KEY(CAREGORY_ID) REFERENCES " + CATEGORY + "(_id));");[m
+[32m+[m[32m                    + "FOREIGN KEY(CATEGORY_ID) REFERENCES " + CATEGORY + "(_id));");[m
+             db.execSQL("CREATE TABLE "+ INGREDIENT +" (_id INTEGER PRIMARY KEY AUTOINCREMENT," +[m
+                     "NAME TEXT," +[m
+                     "MEASURE TEXT," +[m
+[36m@@ -57,22 +57,6 @@[m [mpublic class RecipeDatabaseHelper extends SQLiteOpenHelper {[m
+             insertIngredients(db);[m
+             insertRecipesCategories(db);[m
+ [m
+[31m-            //insertRecipe(db, "Summer Pudding", "Crush the biscuits and most of the almonds inside a plastic food bag using a rolling pin", R.drawable.homemadechickenpotpie);[m
+[31m-            //insertRecipe(db, "diavolo", "Heat the oil in a deep frying pan and fry the beef mince for 4-5 minutes", R.drawable.diavolo);[m
+[31m-            //insertCategory(db, "Pica");[m
+[31m-            //insertCategory(db, "Dessert");[m
+[31m-            //insertCategory(db, "Lamb");[m
+[31m-//            insertCategory(db, "Breakfast");[m
+[31m-//            insertIngredient(db, "Strawberries", "300g", 1);[m
+[31m-//            insertIngredient(db, "Blackberries", "250g", 1);[m
+[31m-//            insertIngredient(db, "Redcurrants", "100g", 1);[m
+[31m-//            insertIngredient(db, "Shoulder", "300g", 2);[m
+[31m-//            insertIngredient(db, "Flour", "250g", 2);[m
+[31m-//            insertIngredient(db, "Vegetable Oil", "100g", 2);[m
+[31m-//            insertRecipeCategory(db, 1, 2);[m
+[31m-//            insertRecipeCategory(db, 1, 4);[m
+[31m-//            insertRecipeCategory(db, 2, 1);[m
+[31m-//            insertRecipeCategory(db, 2, 3);[m
+         }[m
+         if (oldVersion < 2){[m
+             //For updates[m
+[36m@@ -136,7 +120,7 @@[m [mpublic class RecipeDatabaseHelper extends SQLiteOpenHelper {[m
+                                              int category_id){[m
+         ContentValues recipeCategoryValues = new ContentValues();[m
+         recipeCategoryValues.put("RECIPE_ID", recipe_id);[m
+[31m-        recipeCategoryValues.put("CAREGORY_ID", category_id);[m
+[32m+[m[32m        recipeCategoryValues.put("CATEGORY_ID", category_id);[m
+         db.insert(RECIPECATEGORY, null, recipeCategoryValues);[m
+     }[m
+ }[m
+[1mdiff --git a/app/src/main/java/com/example/recipemanager/RecipeDetailActivity.java b/app/src/main/java/com/example/recipemanager/RecipeDetailActivity.java[m
+[1mindex b037526..a34a0b4 100644[m
+[1m--- a/app/src/main/java/com/example/recipemanager/RecipeDetailActivity.java[m
+[1m+++ b/app/src/main/java/com/example/recipemanager/RecipeDetailActivity.java[m
+[36m@@ -10,6 +10,7 @@[m [mimport android.database.Cursor;[m
+ import android.database.SQLException;[m
+ import android.database.sqlite.SQLiteDatabase;[m
+ import android.database.sqlite.SQLiteOpenHelper;[m
+[32m+[m[32mimport android.os.AsyncTask;[m
+ import android.os.Bundle;[m
+ import android.widget.ImageView;[m
+ import android.widget.TextView;[m
+[36m@@ -19,6 +20,7 @@[m [mimport com.google.android.material.appbar.CollapsingToolbarLayout;[m
+ [m
+ import org.w3c.dom.Text;[m
+ [m
+[32m+[m[32mimport java.util.ArrayList;[m
+ import java.util.List;[m
+ [m
+ public class RecipeDetailActivity extends AppCompatActivity {[m
+[36m@@ -40,58 +42,81 @@[m [mpublic class RecipeDetailActivity extends AppCompatActivity {[m
+ [m
+ [m
+         //Display details of Recipe[m
+[31m-        Intent intent = getIntent();[m
+[31m-        Recipe recipe = intent.getParcelableExtra(EXTRA_RECIPE_ID);[m
+[31m-[m
+[31m-        int recipeId = recipe.getId();[m
+[31m-        String recipeName = recipe.getName();[m
+[31m-        String recipeInstruction = recipe.getInstruction();[m
+[31m-        int recipeImage = recipe.getImageResource();[m
+[31m-        SQLiteOpenHelper recipeDatabaseHelper = new RecipeDatabaseHelper(this);[m
+[31m-        try {[m
+[31m-            SQLiteDatabase db = recipeDatabaseHelper.getReadableDatabase();[m
+[31m-            Cursor cursorCategories = db.rawQuery("SELECT CATEGORY.NAME " +[m
+[31m-                    "FROM CATEGORY " +[m
+[31m-                    "INNER JOIN RECIPECATEGORY ON CATEGORY._id = RECIPECATEGORY.CAREGORY_ID " +[m
+[31m-                    "INNER JOIN RECIPE ON RECIPE._id = RECIPECATEGORY.RECIPE_ID " +[m
+[31m-                    "WHERE RECIPE._id = "+ recipeId, null);[m
+[31m-            Cursor cursorIngredients = db.rawQuery("SELECT INGREDIENT.NAME, INGREDIENT.MEASURE " +[m
+[31m-                    "From INGREDIENT " +[m
+[31m-                    "INNER JOIN RECIPE ON RECIPE._id = INGREDIENT.RECIPE_ID " +[m
+[31m-                    "WHERE RECIPE._id = "+ recipeId, null);[m
+[31m-            while(cursorCategories.moveToNext()){[m
+[31m-                String categoryName = cursorCategories.getString(0);[m
+[31m-                categories = categories + categoryName + " ";[m
+[31m-            }[m
+[31m-            while (cursorIngredients.moveToNext()){[m
+[31m-                String ingredientName = cursorIngredients.getString(0);[m
+[31m-                String ingredientMeasure = cursorIngredients.getString(1);[m
+[31m-                ingredientNames = ingredientNames + ingredientName + "\n";[m
+[31m-                ingredientMeasures = ingredientMeasures + ingredientMeasure + " \n";[m
+[31m-            }[m
+[31m-            cursorCategories.close();[m
+[31m-            cursorIngredients.close();[m
+[31m-            db.close();[m
+[31m-        } catch (SQLException e){[m
+[31m-            Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT).show();[m
+[32m+[m[32m        new FillDataWithDetails().execute();[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    private class FillDataWithDetails extends AsyncTask<Integer, Void, Boolean> {[m
+[32m+[m
+[32m+[m[32m        private int recipeId;[m
+[32m+[m[32m        private String recipeName;[m
+[32m+[m[32m        private String recipeInstruction;[m
+[32m+[m[32m        private int recipeImage;[m
+[32m+[m
+[32m+[m[32m        protected void onPreExecute(){[m
+[32m+[m[32m            Intent intent = getIntent();[m
+[32m+[m[32m            Recipe recipe = intent.getParcelableExtra(EXTRA_RECIPE_ID);[m
+[32m+[m[32m            recipeId = recipe.getId();[m
+[32m+[m[32m            recipeName = recipe.getName();[m
+[32m+[m[32m            recipeInstruction = recipe.getInstruction();[m
+[32m+[m[32m            recipeImage = recipe.getImageResource();[m
+         }[m
+ [m
+[31m-        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);[m
+[31m-        collapsingToolbarLayout.setTitle(recipeName);[m
+[31m-        ImageView imageView = (ImageView) findViewById(R.id.recipe_image);[m
+[31m-        imageView.setImageDrawable(ContextCompat.getDrawable(this, recipeImage));[m
+[31m-        imageView.setContentDescription(recipeName);[m
+[31m-        TextView instructionTextView = (TextView) findViewById(R.id.recipe_instructions);[m
+[31m-        instructionTextView.setText(recipeInstruction);[m
+[31m-        TextView categoriesTextView = (TextView) findViewById(R.id.recipe_category);[m
+[31m-        categoriesTextView.setText(categories);[m
+[31m-        TextView ingredientTextView = (TextView) findViewById(R.id.ingredients);[m
+[31m-        TextView measureTextView = (TextView) findViewById(R.id.mesure);[m
+[31m-        ingredientTextView.setText(ingredientNames);[m
+[31m-        measureTextView.setText(ingredientMeasures);[m
+[31m-        categories = "";[m
+[31m-        ingredientNames = "";[m
+[31m-        ingredientMeasures = "";[m
+[32m+[m[32m        @Override[m
+[32m+[m[32m        protected Boolean doInBackground(Integer... integers) {[m
+[32m+[m[32m            SQLiteOpenHelper recipeDatabaseHelper = new RecipeDatabaseHelper(RecipeDetailActivity.this);[m
+[32m+[m[32m            try {[m
+[32m+[m[32m                SQLiteDatabase db = recipeDatabaseHelper.getReadableDatabase();[m
+[32m+[m[32m                Cursor cursorCategories = db.rawQuery("SELECT CATEGORY.NAME " +[m
+[32m+[m[32m                        "FROM CATEGORY " +[m
+[32m+[m[32m                        "INNER JOIN RECIPECATEGORY ON CATEGORY._id = RECIPECATEGORY.CATEGORY_ID " +[m
+[32m+[m[32m                        "INNER JOIN RECIPE ON RECIPE._id = RECIPECATEGORY.RECIPE_ID " +[m
+[32m+[m[32m                        "WHERE RECIPE._id = "+ recipeId, null);[m
+[32m+[m[32m                Cursor cursorIngredients = db.rawQuery("SELECT INGREDIENT.NAME, INGREDIENT.MEASURE " +[m
+[32m+[m[32m                        "From INGREDIENT " +[m
+[32m+[m[32m              
